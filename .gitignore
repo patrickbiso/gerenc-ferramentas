@@ -1,0 +1,21 @@
+# Maven
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ
+.idea/
+*.iml
+/out/
+
+# Logs
+*.log
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# VS Code (se usar junto)
+.vscode/
+
+# Arquivos de build
+*.class
