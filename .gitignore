@@ -14,7 +14,7 @@
 .DS_Store
 Thumbs.db
 
-# VS Code (se usar junto)
+# VS Code
 .vscode/
 
 # Arquivos de build
