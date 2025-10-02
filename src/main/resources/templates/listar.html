@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ferramentas - Lista</title>
+</head>
+<body>
+<h1>Ferramentas</h1>
+
+<p th:if="${msg}" th:text="${msg}"></p>
+
+<p><a th:href="@{/ferramentas/nova}">Nova Ferramenta</a></p>
+
+<form th:action="@{/ferramentas/buscar}" method="get">
+    <input type="text" name="nome" placeholder="Pesquisar por nome"/>
+    <button type="submit">Buscar</button>
+</form>
+
+<table border="1">
+    <tr>
+        <th>Código</th>
+        <th>Nome</th>
+        <th>Categoria</th>
+        <th>Quantidade</th>
+        <th>Preço</th>
+        <th>Ações</th>
+    </tr>
+    <tr th:each="f : ${ferramentas}">
+        <td th:text="${f.codigo}"></td>
+        <td th:text="${f.nome}"></td>
+        <td th:text="${f.categoria}"></td>
+        <td th:text="${f.quantidade}"></td>
+        <td th:text="${f.preco}"></td>
+        <td>
+            <form th:action="@{/ferramentas/editar/{id}(id=${f.id})}" method="get">
+                <button type="submit">Editar</button>
+            </form>
+            <form th:action="@{/ferramentas/excluir/{id}(id=${f.id})}" method="get">
+                <button type="submit" onclick="return confirm('Tem certeza?')">Excluir</button>
+            </form>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
