@@ -13,6 +13,7 @@ public class Ferramenta {
     private Long id;
 
     @NotBlank(message = "O código é obrigatório")
+    @Pattern(regexp = "F\\d{3}", message = "O código deve estar no formato F001, F002, ...")
     @Column(nullable = false, unique = true)
     private String codigo;
 
@@ -32,6 +33,8 @@ public class Ferramenta {
     @DecimalMin(value = "0.01", message = "O preço deve ser maior que zero")
     private BigDecimal preco;
 
+    @NotBlank(message = "O fornecedor é obrigatório")
+    @Column(nullable = false)
     private String fornecedor;
 
     private Integer garantiaMeses;

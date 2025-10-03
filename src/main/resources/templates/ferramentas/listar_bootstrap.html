@@ -21,9 +21,10 @@
 <div class="container mt-4">
     <h2>Lista de Ferramentas</h2>
 
-
-    <div th:if="${msg}" class="alert alert-info" role="alert" th:text="${msg}"></div>
-
+    <!-- mensagens globais -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+    <div th:if="${msg}" class="alert alert-info" th:text="${msg}"></div>
 
     <form th:action="@{/ferramentas/buscar}" method="get" class="row g-3 mb-3">
         <div class="col-auto">
@@ -60,8 +61,6 @@
             <td th:text="${f.fornecedor}"></td>
             <td>
                 <a th:href="@{/ferramentas/editar/{id}(id=${f.id})}" class="btn btn-warning btn-sm">Editar</a>
-
-
                 <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                         data-bs-target="#deleteModal"
                         th:attr="data-id=${f.id}, data-nome=${f.nome}">
@@ -72,7 +71,6 @@
         </tbody>
     </table>
 </div>
-
 
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -96,7 +94,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-
     var deleteModal = document.getElementById('deleteModal');
     deleteModal.addEventListener('show.bs.modal', function (event) {
         var button = event.relatedTarget;
