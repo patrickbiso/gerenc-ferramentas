@@ -8,10 +8,10 @@
 <body>
 <nav class="navbar navbar-expand-lg bg-dark border-bottom border-body" data-bs-theme="dark">
     <div class="container-fluid">
-        <a class="navbar-brand" th:href="@{/templates/ferramentas}">Gerenciamento de Ferramentas</a>
+        <a class="navbar-brand" th:href="@{/ferramentas}">Gerenciamento de Ferramentas</a>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link" th:href="@{/templates/ferramentas}">Lista</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/ferramentas}">Lista</a></li>
                 <li class="nav-item"><a class="nav-link" th:href="@{/ferramentas/nova}">Nova</a></li>
             </ul>
         </div>
@@ -21,9 +21,10 @@
 <div class="container mt-4">
     <h2>Lista de Ferramentas</h2>
 
+    <!-- Mensagem de sucesso/erro -->
+    <div th:if="${msg}" class="alert alert-info" role="alert" th:text="${msg}"></div>
 
-    <div th:if="${msg}" class="alert alert-success" role="alert" th:text="${msg}"></div>
-
+    <!-- Formulário de pesquisa -->
     <form th:action="@{/ferramentas/buscar}" method="get" class="row g-3 mb-3">
         <div class="col-auto">
             <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome">
@@ -33,7 +34,7 @@
         </div>
     </form>
 
-    <a href="/ferramentas/nova" class="btn btn-success mb-3">+ Nova Ferramenta</a>
+    <a th:href="@{/ferramentas/nova}" class="btn btn-success mb-3">+ Nova Ferramenta</a>
 
     <table class="table table-striped">
         <thead>
