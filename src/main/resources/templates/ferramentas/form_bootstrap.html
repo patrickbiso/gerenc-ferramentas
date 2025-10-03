@@ -9,40 +9,43 @@
 
 <h2 th:text="${ferramenta.id != null} ? 'Editar Ferramenta' : 'Nova Ferramenta'"></h2>
 
+
+<div th:if="${msg}" class="alert alert-danger" role="alert" th:text="${msg}"></div>
+
 <form th:action="@{/ferramentas/salvar}" th:object="${ferramenta}" method="post" class="mt-3">
     <input type="hidden" th:field="*{id}"/>
 
     <div class="mb-3">
-        <label class="form-label">Código</label>
-        <input type="text" th:field="*{codigo}" class="form-control" required>
+        <label class="form-label">Código <span class="text-danger">*</span></label>
+        <input type="text" th:field="*{codigo}" class="form-control">
         <div th:if="${#fields.hasErrors('codigo')}" class="text-danger" th:errors="*{codigo}"></div>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Nome</label>
-        <input type="text" th:field="*{nome}" class="form-control" required>
+        <label class="form-label">Nome <span class="text-danger">*</span></label>
+        <input type="text" th:field="*{nome}" class="form-control">
         <div th:if="${#fields.hasErrors('nome')}" class="text-danger" th:errors="*{nome}"></div>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Categoria</label>
+        <label class="form-label">Categoria <span class="text-muted">(opcional)</span></label>
         <input type="text" th:field="*{categoria}" class="form-control">
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Descrição</label>
+        <label class="form-label">Descrição <span class="text-muted">(opcional)</span></label>
         <textarea th:field="*{descricao}" class="form-control"></textarea>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Quantidade</label>
-        <input type="number" th:field="*{quantidade}" class="form-control" required>
+        <label class="form-label">Quantidade <span class="text-danger">*</span></label>
+        <input type="number" th:field="*{quantidade}" class="form-control">
         <div th:if="${#fields.hasErrors('quantidade')}" class="text-danger" th:errors="*{quantidade}"></div>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Preço</label>
-        <input type="number" step="0.01" th:field="*{preco}" class="form-control" required>
+        <label class="form-label">Preço <span class="text-danger">*</span></label>
+        <input type="number" step="0.01" th:field="*{preco}" class="form-control">
         <div th:if="${#fields.hasErrors('preco')}" class="text-danger" th:errors="*{preco}"></div>
     </div>
 
@@ -52,13 +55,13 @@
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Garantia (meses)</label>
+        <label class="form-label">Garantia (meses) <span class="text-muted">(opcional)</span></label>
         <input type="number" th:field="*{garantiaMeses}" class="form-control">
     </div>
 
     <div class="form-check mb-3">
-        <input type="checkbox" th:field="*{ativo}" class="form-check-input">
-        <label class="form-check-label">Ativo</label>
+        <input type="checkbox" th:field="*{ativo}" class="form-check-input" id="ativoId">
+        <label class="form-check-label" for="ativoId">Ativo</label>
     </div>
 
     <button type="submit" class="btn btn-primary">Salvar</button>

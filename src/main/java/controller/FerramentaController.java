@@ -4,6 +4,7 @@ import com.example.gerencferramentas.model.Ferramenta;
 import com.example.gerencferramentas.service.FerramentaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -34,30 +35,42 @@ public class FerramentaController {
     @PostMapping("/salvar")
     public String salvar(@Valid @ModelAttribute Ferramenta ferramenta,
                          BindingResult result,
-                         RedirectAttributes redirectAttributes) {
+                         RedirectAttributes redirectAttributes,
+                         Model model) {
         if (result.hasErrors()) {
+
             return "ferramentas/form_bootstrap";
         }
-        ferramentaService.salvar(ferramenta);
-        redirectAttributes.addFlashAttribute("msg", "Ferramenta salva com sucesso!");
+        try {
+            ferramentaService.salvar(ferramenta);
+            redirectAttributes.addFlashAttribute("msg", "Ferramenta salva com sucesso!");
+        } catch (DataIntegrityViolationException ex) {
+
+            model.addAttribute("ferramenta", ferramenta);
+            model.addAttribute("msg", "Erro: código duplicado ou violação de integridade.");
+            return "ferramentas/form_bootstrap";
+        } catch (Exception ex) {
+            redirectAttributes.addFlashAttribute("msg", "Erro ao salvar: " + ex.getMessage());
+        }
         return "redirect:/ferramentas";
     }
 
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
-        Ferramenta ferramenta = ferramentaService.buscarPorId(id);
-        if (ferramenta == null) {
+        Ferramenta f = ferramentaService.buscarPorId(id);
+        if (f == null) {
             redirectAttributes.addFlashAttribute("msg", "Ferramenta não encontrada!");
             return "redirect:/ferramentas";
         }
-        model.addAttribute("ferramenta", ferramenta);
+        model.addAttribute("ferramenta", f);
         return "ferramentas/form_bootstrap";
     }
 
-    @GetMapping("/excluir/{id}")
-    public String excluir(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        Ferramenta ferramenta = ferramentaService.buscarPorId(id);
-        if (ferramenta == null) {
+
+    @PostMapping("/excluir/{id}")
+    public String excluirPost(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        Ferramenta f = ferramentaService.buscarPorId(id);
+        if (f == null) {
             redirectAttributes.addFlashAttribute("msg", "Ferramenta não encontrada!");
         } else {
             ferramentaService.excluir(id);
@@ -66,10 +79,28 @@ public class FerramentaController {
         return "redirect:/ferramentas";
     }
 
+
+    @GetMapping("/excluir/{id}")
+    public String excluirGet(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        return excluirPost(id, redirectAttributes);
+    }
+
     @GetMapping("/buscar")
     public String buscar(@RequestParam String nome, Model model) {
         List<Ferramenta> resultados = ferramentaService.buscarPorNome(nome);
         model.addAttribute("ferramentas", resultados);
         return "ferramentas/listar_bootstrap";
+    }
+
+
+    @GetMapping("/{id}")
+    public String detalhes(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        Ferramenta f = ferramentaService.buscarPorId(id);
+        if (f == null) {
+            redirectAttributes.addFlashAttribute("msg", "Ferramenta não encontrada!");
+            return "redirect:/ferramentas";
+        }
+        model.addAttribute("ferramenta", f);
+        return "ferramentas/detalhes_bootstrap";
     }
 }
