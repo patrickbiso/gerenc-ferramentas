@@ -23,3 +23,13 @@ VALUES
 ('F004', 'Serra Circular', 'Elétrica', 'Serra circular 1200W', 10, 349.00, 'ConstruPrime', 12),
 ('F005', 'Trena 5m', 'Medida', 'Trena de aço com trava', 75, 15.00, 'MedTools', 6);
 
+CREATE TABLE usuarios (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    senha VARCHAR(20) NOT NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO usuarios (nome, email, senha) VALUES
+('Patrick Mendes', 'patrick.bisolato@email.com', 'admin123');
