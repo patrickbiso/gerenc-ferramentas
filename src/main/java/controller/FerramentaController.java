@@ -1,7 +1,9 @@
 package com.example.gerencferramentas.controller;
 
 import com.example.gerencferramentas.model.Ferramenta;
+import com.example.gerencferramentas.model.Usuario;
 import com.example.gerencferramentas.service.FerramentaService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,14 +22,67 @@ public class FerramentaController {
     @Autowired
     private FerramentaService ferramentaService;
 
+    private boolean adicionarUsuarioNaModel(HttpSession session, Model model) {
+        Object usuarioObj = session.getAttribute("usuarioLogado");
+        if (usuarioObj != null) {
+            Usuario usuario = (Usuario) usuarioObj;
+            model.addAttribute("usuarioNome", usuario.getNome());
+            return true;
+        } else {
+            model.addAttribute("usuarioNome", "Visitante");
+            return false;
+        }
+    }
+
     @GetMapping
-    public String listar(Model model) {
-        model.addAttribute("ferramentas", ferramentaService.listarTodas());
+    public String listar(Model model, HttpSession session) {
+        if (!adicionarUsuarioNaModel(session, model)) {
+            return "redirect:/login";
+        }
+        String filtroNome = (String) session.getAttribute("filtroNome");
+        List<Ferramenta> ferramentas;
+        if (filtroNome != null && !filtroNome.isEmpty()) {
+            ferramentas = ferramentaService.buscarPorNome(filtroNome);
+            model.addAttribute("filtroNome", filtroNome);
+        } else {
+            ferramentas = ferramentaService.listarTodas();
+            model.addAttribute("filtroNome", "");
+        }
+        model.addAttribute("ferramentas", ferramentas);
         return "ferramentas/listar_bootstrap";
     }
 
+    @GetMapping("/buscar")
+    public String buscar(@RequestParam(required = false) String nome, Model model, HttpSession session) {
+        if (!adicionarUsuarioNaModel(session, model)) {
+            return "redirect:/login";
+        }
+        if (nome != null && !nome.isEmpty()) {
+            session.setAttribute("filtroNome", nome);
+        }
+        String filtroNome = (String) session.getAttribute("filtroNome");
+        List<Ferramenta> resultados;
+        if (filtroNome != null && !filtroNome.isEmpty()) {
+            resultados = ferramentaService.buscarPorNome(filtroNome);
+        } else {
+            resultados = ferramentaService.listarTodas();
+        }
+        model.addAttribute("ferramentas", resultados);
+        model.addAttribute("filtroNome", filtroNome != null ? filtroNome : "");
+        return "ferramentas/listar_bootstrap";
+    }
+
+    @GetMapping("/limparFiltro")
+    public String limparFiltro(HttpSession session) {
+        session.removeAttribute("filtroNome");
+        return "redirect:/ferramentas";
+    }
+
     @GetMapping("/nova")
-    public String nova(Model model) {
+    public String nova(Model model, HttpSession session) {
+        if (!adicionarUsuarioNaModel(session, model)) {
+            return "redirect:/login";
+        }
         model.addAttribute("ferramenta", new Ferramenta());
         return "ferramentas/form_bootstrap";
     }
@@ -36,16 +91,18 @@ public class FerramentaController {
     public String salvar(@Valid @ModelAttribute Ferramenta ferramenta,
                          BindingResult result,
                          RedirectAttributes redirectAttributes,
-                         Model model) {
+                         Model model,
+                         HttpSession session) {
+        if (!adicionarUsuarioNaModel(session, model)) {
+            return "redirect:/login";
+        }
         if (result.hasErrors()) {
-
             return "ferramentas/form_bootstrap";
         }
         try {
             ferramentaService.salvar(ferramenta);
             redirectAttributes.addFlashAttribute("msg", "Ferramenta salva com sucesso!");
         } catch (DataIntegrityViolationException ex) {
-
             model.addAttribute("ferramenta", ferramenta);
             model.addAttribute("msg", "Erro: código duplicado ou violação de integridade.");
             return "ferramentas/form_bootstrap";
@@ -56,7 +113,10 @@ public class FerramentaController {
     }
 
     @GetMapping("/editar/{id}")
-    public String editar(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String editar(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes, HttpSession session) {
+        if (!adicionarUsuarioNaModel(session, model)) {
+            return "redirect:/login";
+        }
         Ferramenta f = ferramentaService.buscarPorId(id);
         if (f == null) {
             redirectAttributes.addFlashAttribute("msg", "Ferramenta não encontrada!");
@@ -66,9 +126,11 @@ public class FerramentaController {
         return "ferramentas/form_bootstrap";
     }
 
-
     @PostMapping("/excluir/{id}")
-    public String excluirPost(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String excluirPost(@PathVariable Long id, RedirectAttributes redirectAttributes, HttpSession session, Model model) {
+        if (!adicionarUsuarioNaModel(session, model)) {
+            return "redirect:/login";
+        }
         Ferramenta f = ferramentaService.buscarPorId(id);
         if (f == null) {
             redirectAttributes.addFlashAttribute("msg", "Ferramenta não encontrada!");
@@ -79,22 +141,16 @@ public class FerramentaController {
         return "redirect:/ferramentas";
     }
 
-
     @GetMapping("/excluir/{id}")
-    public String excluirGet(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        return excluirPost(id, redirectAttributes);
+    public String excluirGet(@PathVariable Long id, RedirectAttributes redirectAttributes, HttpSession session, Model model) {
+        return excluirPost(id, redirectAttributes, session, model);
     }
-
-    @GetMapping("/buscar")
-    public String buscar(@RequestParam String nome, Model model) {
-        List<Ferramenta> resultados = ferramentaService.buscarPorNome(nome);
-        model.addAttribute("ferramentas", resultados);
-        return "ferramentas/listar_bootstrap";
-    }
-
 
     @GetMapping("/{id}")
-    public String detalhes(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String detalhes(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes, HttpSession session) {
+        if (!adicionarUsuarioNaModel(session, model)) {
+            return "redirect:/login";
+        }
         Ferramenta f = ferramentaService.buscarPorId(id);
         if (f == null) {
             redirectAttributes.addFlashAttribute("msg", "Ferramenta não encontrada!");
